@@ -1,0 +1,523 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4653FDE01B88C876004306EA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4653FDDF1B88C876004306EA /* AppDelegate.swift */; };
+		4653FDE21B88C876004306EA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4653FDE11B88C876004306EA /* ViewController.swift */; };
+		4653FDE51B88C876004306EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4653FDE31B88C876004306EA /* Main.storyboard */; };
+		4653FDE81B88C876004306EA /* HM10Terminal2.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4653FDE61B88C876004306EA /* HM10Terminal2.xcdatamodeld */; };
+		4653FDEA1B88C876004306EA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4653FDE91B88C876004306EA /* Assets.xcassets */; };
+		4653FDED1B88C876004306EA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4653FDEB1B88C876004306EA /* LaunchScreen.storyboard */; };
+		4653FDF81B88C877004306EA /* HM10Terminal2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4653FDF71B88C877004306EA /* HM10Terminal2Tests.swift */; };
+		4653FE031B88C877004306EA /* HM10Terminal2UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4653FE021B88C877004306EA /* HM10Terminal2UITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4653FDF41B88C877004306EA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4653FDD41B88C876004306EA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4653FDDB1B88C876004306EA;
+			remoteInfo = HM10Terminal2;
+		};
+		4653FDFF1B88C877004306EA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4653FDD41B88C876004306EA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4653FDDB1B88C876004306EA;
+			remoteInfo = HM10Terminal2;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4653FDDC1B88C876004306EA /* HM10Terminal2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HM10Terminal2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4653FDDF1B88C876004306EA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		4653FDE11B88C876004306EA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4653FDE41B88C876004306EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4653FDE71B88C876004306EA /* HM10Terminal2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HM10Terminal2.xcdatamodel; sourceTree = "<group>"; };
+		4653FDE91B88C876004306EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4653FDEC1B88C876004306EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		4653FDEE1B88C876004306EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4653FDF31B88C877004306EA /* HM10Terminal2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HM10Terminal2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4653FDF71B88C877004306EA /* HM10Terminal2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HM10Terminal2Tests.swift; sourceTree = "<group>"; };
+		4653FDF91B88C877004306EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4653FDFE1B88C877004306EA /* HM10Terminal2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HM10Terminal2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4653FE021B88C877004306EA /* HM10Terminal2UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HM10Terminal2UITests.swift; sourceTree = "<group>"; };
+		4653FE041B88C877004306EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4653FDD91B88C876004306EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4653FDF01B88C877004306EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4653FDFB1B88C877004306EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4653FDD31B88C876004306EA = {
+			isa = PBXGroup;
+			children = (
+				4653FDDE1B88C876004306EA /* HM10Terminal2 */,
+				4653FDF61B88C877004306EA /* HM10Terminal2Tests */,
+				4653FE011B88C877004306EA /* HM10Terminal2UITests */,
+				4653FDDD1B88C876004306EA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4653FDDD1B88C876004306EA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4653FDDC1B88C876004306EA /* HM10Terminal2.app */,
+				4653FDF31B88C877004306EA /* HM10Terminal2Tests.xctest */,
+				4653FDFE1B88C877004306EA /* HM10Terminal2UITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4653FDDE1B88C876004306EA /* HM10Terminal2 */ = {
+			isa = PBXGroup;
+			children = (
+				4653FDDF1B88C876004306EA /* AppDelegate.swift */,
+				4653FDE11B88C876004306EA /* ViewController.swift */,
+				4653FDE31B88C876004306EA /* Main.storyboard */,
+				4653FDE91B88C876004306EA /* Assets.xcassets */,
+				4653FDEB1B88C876004306EA /* LaunchScreen.storyboard */,
+				4653FDEE1B88C876004306EA /* Info.plist */,
+				4653FDE61B88C876004306EA /* HM10Terminal2.xcdatamodeld */,
+			);
+			path = HM10Terminal2;
+			sourceTree = "<group>";
+		};
+		4653FDF61B88C877004306EA /* HM10Terminal2Tests */ = {
+			isa = PBXGroup;
+			children = (
+				4653FDF71B88C877004306EA /* HM10Terminal2Tests.swift */,
+				4653FDF91B88C877004306EA /* Info.plist */,
+			);
+			path = HM10Terminal2Tests;
+			sourceTree = "<group>";
+		};
+		4653FE011B88C877004306EA /* HM10Terminal2UITests */ = {
+			isa = PBXGroup;
+			children = (
+				4653FE021B88C877004306EA /* HM10Terminal2UITests.swift */,
+				4653FE041B88C877004306EA /* Info.plist */,
+			);
+			path = HM10Terminal2UITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4653FDDB1B88C876004306EA /* HM10Terminal2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4653FE071B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2" */;
+			buildPhases = (
+				4653FDD81B88C876004306EA /* Sources */,
+				4653FDD91B88C876004306EA /* Frameworks */,
+				4653FDDA1B88C876004306EA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HM10Terminal2;
+			productName = HM10Terminal2;
+			productReference = 4653FDDC1B88C876004306EA /* HM10Terminal2.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4653FDF21B88C877004306EA /* HM10Terminal2Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4653FE0A1B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2Tests" */;
+			buildPhases = (
+				4653FDEF1B88C877004306EA /* Sources */,
+				4653FDF01B88C877004306EA /* Frameworks */,
+				4653FDF11B88C877004306EA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4653FDF51B88C877004306EA /* PBXTargetDependency */,
+			);
+			name = HM10Terminal2Tests;
+			productName = HM10Terminal2Tests;
+			productReference = 4653FDF31B88C877004306EA /* HM10Terminal2Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4653FDFD1B88C877004306EA /* HM10Terminal2UITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4653FE0D1B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2UITests" */;
+			buildPhases = (
+				4653FDFA1B88C877004306EA /* Sources */,
+				4653FDFB1B88C877004306EA /* Frameworks */,
+				4653FDFC1B88C877004306EA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4653FE001B88C877004306EA /* PBXTargetDependency */,
+			);
+			name = HM10Terminal2UITests;
+			productName = HM10Terminal2UITests;
+			productReference = 4653FDFE1B88C877004306EA /* HM10Terminal2UITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4653FDD41B88C876004306EA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Honeysuckle Hardware";
+				TargetAttributes = {
+					4653FDDB1B88C876004306EA = {
+						CreatedOnToolsVersion = 7.0;
+					};
+					4653FDF21B88C877004306EA = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 4653FDDB1B88C876004306EA;
+					};
+					4653FDFD1B88C877004306EA = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 4653FDDB1B88C876004306EA;
+					};
+				};
+			};
+			buildConfigurationList = 4653FDD71B88C876004306EA /* Build configuration list for PBXProject "HM10Terminal2" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4653FDD31B88C876004306EA;
+			productRefGroup = 4653FDDD1B88C876004306EA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4653FDDB1B88C876004306EA /* HM10Terminal2 */,
+				4653FDF21B88C877004306EA /* HM10Terminal2Tests */,
+				4653FDFD1B88C877004306EA /* HM10Terminal2UITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4653FDDA1B88C876004306EA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4653FDED1B88C876004306EA /* LaunchScreen.storyboard in Resources */,
+				4653FDEA1B88C876004306EA /* Assets.xcassets in Resources */,
+				4653FDE51B88C876004306EA /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4653FDF11B88C877004306EA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4653FDFC1B88C877004306EA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4653FDD81B88C876004306EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4653FDE81B88C876004306EA /* HM10Terminal2.xcdatamodeld in Sources */,
+				4653FDE21B88C876004306EA /* ViewController.swift in Sources */,
+				4653FDE01B88C876004306EA /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4653FDEF1B88C877004306EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4653FDF81B88C877004306EA /* HM10Terminal2Tests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4653FDFA1B88C877004306EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4653FE031B88C877004306EA /* HM10Terminal2UITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4653FDF51B88C877004306EA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4653FDDB1B88C876004306EA /* HM10Terminal2 */;
+			targetProxy = 4653FDF41B88C877004306EA /* PBXContainerItemProxy */;
+		};
+		4653FE001B88C877004306EA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4653FDDB1B88C876004306EA /* HM10Terminal2 */;
+			targetProxy = 4653FDFF1B88C877004306EA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		4653FDE31B88C876004306EA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4653FDE41B88C876004306EA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		4653FDEB1B88C876004306EA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4653FDEC1B88C876004306EA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4653FE051B88C877004306EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4653FE061B88C877004306EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4653FE081B88C877004306EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = HM10Terminal2/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Honeysuckle-Hardware.HM10Terminal2";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		4653FE091B88C877004306EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = HM10Terminal2/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Honeysuckle-Hardware.HM10Terminal2";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		4653FE0B1B88C877004306EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = HM10Terminal2Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Honeysuckle-Hardware.HM10Terminal2Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HM10Terminal2.app/HM10Terminal2";
+			};
+			name = Debug;
+		};
+		4653FE0C1B88C877004306EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = HM10Terminal2Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Honeysuckle-Hardware.HM10Terminal2Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HM10Terminal2.app/HM10Terminal2";
+			};
+			name = Release;
+		};
+		4653FE0E1B88C877004306EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = HM10Terminal2UITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Honeysuckle-Hardware.HM10Terminal2UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = HM10Terminal2;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		4653FE0F1B88C877004306EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = HM10Terminal2UITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Honeysuckle-Hardware.HM10Terminal2UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = HM10Terminal2;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4653FDD71B88C876004306EA /* Build configuration list for PBXProject "HM10Terminal2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4653FE051B88C877004306EA /* Debug */,
+				4653FE061B88C877004306EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4653FE071B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4653FE081B88C877004306EA /* Debug */,
+				4653FE091B88C877004306EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		4653FE0A1B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4653FE0B1B88C877004306EA /* Debug */,
+				4653FE0C1B88C877004306EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		4653FE0D1B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2UITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4653FE0E1B88C877004306EA /* Debug */,
+				4653FE0F1B88C877004306EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		4653FDE61B88C876004306EA /* HM10Terminal2.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				4653FDE71B88C876004306EA /* HM10Terminal2.xcdatamodel */,
+			);
+			currentVersion = 4653FDE71B88C876004306EA /* HM10Terminal2.xcdatamodel */;
+			path = HM10Terminal2.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 4653FDD41B88C876004306EA /* Project object */;
+}
