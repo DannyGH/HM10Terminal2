@@ -15,6 +15,8 @@
 		4653FDED1B88C876004306EA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4653FDEB1B88C876004306EA /* LaunchScreen.storyboard */; };
 		4653FDF81B88C877004306EA /* HM10Terminal2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4653FDF71B88C877004306EA /* HM10Terminal2Tests.swift */; };
 		4653FE031B88C877004306EA /* HM10Terminal2UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4653FE021B88C877004306EA /* HM10Terminal2UITests.swift */; };
+		4653FE111B88C9E2004306EA /* bleSerialManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4653FE101B88C9E2004306EA /* bleSerialManager.swift */; };
+		46E60CCC1B96A24E001FC946 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46E60CCB1B96A24E001FC946 /* TableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		4653FDFE1B88C877004306EA /* HM10Terminal2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HM10Terminal2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4653FE021B88C877004306EA /* HM10Terminal2UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HM10Terminal2UITests.swift; sourceTree = "<group>"; };
 		4653FE041B88C877004306EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4653FE101B88C9E2004306EA /* bleSerialManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = bleSerialManager.swift; sourceTree = "<group>"; };
+		46E60CCB1B96A24E001FC946 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,11 +105,13 @@
 			children = (
 				4653FDDF1B88C876004306EA /* AppDelegate.swift */,
 				4653FDE11B88C876004306EA /* ViewController.swift */,
+				46E60CCB1B96A24E001FC946 /* TableViewController.swift */,
 				4653FDE31B88C876004306EA /* Main.storyboard */,
 				4653FDE91B88C876004306EA /* Assets.xcassets */,
 				4653FDEB1B88C876004306EA /* LaunchScreen.storyboard */,
 				4653FDEE1B88C876004306EA /* Info.plist */,
 				4653FDE61B88C876004306EA /* HM10Terminal2.xcdatamodeld */,
+				4653FE101B88C9E2004306EA /* bleSerialManager.swift */,
 			);
 			path = HM10Terminal2;
 			sourceTree = "<group>";
@@ -190,6 +196,7 @@
 		4653FDD41B88C876004306EA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Honeysuckle Hardware";
 				TargetAttributes = {
@@ -261,6 +268,8 @@
 				4653FDE81B88C876004306EA /* HM10Terminal2.xcdatamodeld in Sources */,
 				4653FDE21B88C876004306EA /* ViewController.swift in Sources */,
 				4653FDE01B88C876004306EA /* AppDelegate.swift in Sources */,
+				46E60CCC1B96A24E001FC946 /* TableViewController.swift in Sources */,
+				4653FE111B88C9E2004306EA /* bleSerialManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -487,6 +496,7 @@
 				4653FE091B88C877004306EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4653FE0A1B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2Tests" */ = {
 			isa = XCConfigurationList;
@@ -495,6 +505,7 @@
 				4653FE0C1B88C877004306EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4653FE0D1B88C877004306EA /* Build configuration list for PBXNativeTarget "HM10Terminal2UITests" */ = {
 			isa = XCConfigurationList;
@@ -503,6 +514,7 @@
 				4653FE0F1B88C877004306EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
