@@ -39,9 +39,8 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
         
         // Setup hm10serialManager behavior.
         hm10serialManager.setAutomaticReconnectOnDisconnect(true, tries: 3, timeBetweenTries: 0.5)
-        hm10serialManager.setMutipleConnections(2)
+        hm10serialManager.setMutipleConnections(10)
         hm10serialManager.setRetryConnectAfterFail(true, tries: 3, timeBetweenTries: 0.5)
-        
         
         // Begin search automatically.
         hm10serialManager.search(self, nameOfCallback: "callBack", timeoutSecs: 1.0)
@@ -115,6 +114,7 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
         hm10serialManager.searchTimerTimeout()
         discoveredDevicesNSUUIDSortedByRSSI = hm10serialManager.getSortedArraysBasedOnRSSI().nsuuids
 
+        
         // Reload the data, then end the refreshing controller
         self.tableView.reloadData()
         refreshController.endRefreshing()

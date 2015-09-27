@@ -13,6 +13,8 @@ protocol bleSerialDelegate {
     func searchTimerExpired(controller: AnyObject)
 }
 
+
+
 class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
     // Delegate for search updates.
@@ -22,9 +24,6 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var activePeripheralManager = CBPeripheralManager()
     var peripheralDevice: CBPeripheral?
     var lastConnectedPeripheralNSUUID: NSUUID?
-    
-    // Initialize the activeCentralManagerState
-    var activeCentralManagerState: CBCentralManagerState?
 
     // Search properities.
     private var searchComplete: Bool = false
@@ -39,13 +38,29 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     private var discoveredDeviceListNameString: Dictionary<NSUUID, String> = Dictionary()
     
     // Device descriptors for connected device.
+    private var connectedPeripherals: Dictionary<NSUUID, CBPeripheral> = Dictionary()
     private var connectedPeripheralServices: Array<CBService> = Array()
     private var connectedPeripheralCharacteristics: Array<CBCharacteristic> = Array()
     private var connectedPeripheralCharacteristicsDescriptors: Array<CBDescriptor> = Array()
     
+    enum masterDeviceStates: Int {
+        case Unknown = 0
+        case Resetting
+        case Unsupported
+        case Unauthorized
+        case PoweredOff
+        case PoweredOn
+        case Reconnecting
+        
+    }
+    
+    // Initialize the activeCentralManagerState
+    private(set) var activeCentralManagerState: Int = 0
+    
     // Behavioral options.
+        // Connections limit.
         private var connectionsLimit = 1
-        private var connectionCounter = 0
+
         // Reconnect
         private var automaticReconnectOnDisconnect = true
         private var timeBeforeAttemptingReconnectOnDisconnect = 1.0
@@ -58,11 +73,12 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         private var retryIndexOnDisconnect = 0
         private var retryIndexOnFail = 0
     
+    
     override init(){
         super.init()
         
         // Set initial state.
-        activeCentralManagerState = CBCentralManagerState.Unknown
+//        activeCentralManagerState = CBCentralManagerState.Unknown
         // Attach delegate
         activeCentralManager = CBCentralManager(delegate: self, queue:  dispatch_get_main_queue())
     }
@@ -89,16 +105,30 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     func centralManagerDidUpdateState(central: CBCentralManager) {
         
         // Make sure the iOS BLE device state status is updated.
-        activeCentralManagerState = central.state
+        activeCentralManagerState = central.state.rawValue
         // Make sure the BLE device is on.
-        if central.state == CBCentralManagerState.PoweredOn {
+        switch activeCentralManager.state {
+        case CBCentralManagerState.Unknown:
+            print("Unknown")
+            activeCentralManagerState = central.state.rawValue
+            break
+        case CBCentralManagerState.Resetting:
+            print("Resetting")
+            break
+        case CBCentralManagerState.Unsupported:
+            print("Unsupported")
+            break
+        case CBCentralManagerState.Unauthorized:
+            print("Unauthorized")
+            break
+        case CBCentralManagerState.PoweredOff:
+            print("PoweredOff")
+            break
+        case CBCentralManagerState.PoweredOn:
             // Scan for peripherals if BLE is turned on
             central.scanForPeripheralsWithServices(nil, options: nil)
             print("Searching for BLE Devices")
-        }
-        else {
-            // Can have different conditions for all states if needed - print generic message for now
-            print("Bluetooth switched off or not initialized")
+            break
         }
     }
     
@@ -186,29 +216,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     func search(targetObject: AnyObject, nameOfCallback: String, timeoutSecs: NSTimeInterval){
-       
-        switch activeCentralManager.state {
-            case CBCentralManagerState.Unknown:
-                print("Unknown")
-                break
-            case CBCentralManagerState.Resetting:
-                print("Resetting")
-                break
-            case CBCentralManagerState.Unsupported:
-                print("Unsupported")
-                break
-            case CBCentralManagerState.Unauthorized:
-                print("Unauthorized")
-                break
-            case CBCentralManagerState.PoweredOff:
-                print("PoweredOff")
-                break
-            case CBCentralManagerState.PoweredOn:
-                print("On")
-                break
-//            default:
-//                print("Tried to search, but failed state switch.")
-        }
+
         
         searchComplete = false
         clearDiscoveredDevices()
@@ -229,11 +237,13 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         // Remember NSUUID
         lastConnectedPeripheralNSUUID = deviceNSUUID
         
-        if(discoveredDeviceList.isEmpty){
+        // Check if if we have discovered anything, if so, make sure we are not already connected.
+        if(discoveredDeviceList.isEmpty || alreadyConnected(deviceNSUUID)){
+            print("Already connected, silly")
             return false
         }
         else {
-            if(connectionCounter < connectionsLimit){
+            if(connectedPeripherals.count < connectionsLimit){
                 if let deviceToConnect = discoveredDeviceList[deviceNSUUID] {
                     activeCentralManager.connectPeripheral(deviceToConnect, options: nil)
                 }
@@ -249,11 +259,17 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         return true
     }
     
+    func alreadyConnected(deviceNSUUID: NSUUID) -> Bool {
+        // Checks if we are already connected to a device.
+        return connectedPeripherals[deviceNSUUID] != nil
+    }
+    
     func centralManager(central: CBCentralManager, didConnectPeripheral peripheral: CBPeripheral) {
-
-        // Add a peripheral to number connected.
-        connectionCounter++
-
+        
+        // Add peripheral to connectedPeripheral dictionary.
+        connectedPeripherals.updateValue(peripheral, forKey: peripheral.identifier)
+        hm10serialManager.printConnectedDevices()
+        
         peripheralDevice = peripheral
         peripheralDevice?.delegate = self
         // Look for set services
@@ -330,9 +346,9 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     // #MARK: Connection Lost.
     func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
-        // Add a peripheral to number connected.
-        connectionCounter--
+
         if(automaticReconnectOnDisconnect){
+            activePeripheralManager.state
             reconnectTimer = NSTimer.scheduledTimerWithTimeInterval(timeBeforeAttemptingReconnectOnDisconnect, target: self, selector: Selector("reconnectTimerExpired"), userInfo: nil, repeats: false)
         }
         
@@ -363,17 +379,16 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         else{
             print("Search for devices is not yet complete")
         }
-        
+    }
+    
+    func printConnectedDevices(){
+        print("Number of connected devices: \(connectedPeripherals.count)")
     }
 
-
+    // End of bleSerialManager class.
 }
 
-extension CBCentralManagerState {
 
-    // This is meant to build the CBCentralManagerState -- do I want more states?
-    //var Hyper: Int {return 8}
-}
 
 extension CBPeripheralManager {
 
@@ -381,5 +396,6 @@ extension CBPeripheralManager {
     enum State: Int {
         case disconnected = 0
         case connected
+        case attemptingToReconnect
     }
 }
