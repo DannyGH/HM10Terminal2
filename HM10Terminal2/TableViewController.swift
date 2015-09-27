@@ -12,10 +12,12 @@ import CoreBluetooth
 
 class TableViewController: UITableViewController, CBPeripheralDelegate, bleSerialDelegate {
     
-    var deviceListArray = []
+    var discoveredDevicesNSUUIDSortedByRSSI: Array<NSUUID> = []
+
+    var refreshController = UIRefreshControl()
     
     func searchTimerExpired(controller: AnyObject) {
-        print("BOOYAH!")
+
     }
     
     override func viewDidLoad() {
@@ -26,11 +28,23 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    }
+    
+    override func viewDidAppear(animated: Bool) {
         hm10serialManager.delegate = self
-        print(hm10serialManager.getDeviceState())
-        hm10serialManager.search(self, nameOfCallback: "callBack", timeoutSecs: 1)
-        deviceListArray = hm10serialManager.getDeviceListAsArray()
-
+        
+        // Setup pull-down-on-scroll-to-refresh controller
+        refreshController.addTarget(self, action: Selector("refreshTableOnPullDown"), forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl = refreshController
+        
+        // Setup hm10serialManager behavior.
+        hm10serialManager.setAutomaticReconnectOnDisconnect(true, tries: 3, timeBetweenTries: 0.5)
+        hm10serialManager.setMutipleConnections(2)
+        hm10serialManager.setRetryConnectAfterFail(true, tries: 3, timeBetweenTries: 0.5)
+        
+        
+        // Begin search automatically.
+        hm10serialManager.search(self, nameOfCallback: "callBack", timeoutSecs: 1.0)
     }
 
     override func didReceiveMemoryWarning() {
@@ -42,34 +56,77 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return hm10serialManager.getNumberOfDiscoveredDevices()
+        //print("Number of discovered devices: \(hm10serialManager.getNumberOfDiscoveredDevices())")
+        return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 1
+        return discoveredDevicesNSUUIDSortedByRSSI.count
     }
 
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! devicesCell
 
-        let deviceList = hm10serialManager.getDeviceListAsArray()
-        let deviceOfInterest = deviceList[indexPath.row]
-        print(deviceOfInterest)
+        // Configure the cell if there are any discovered devices.
+        if(!discoveredDevicesNSUUIDSortedByRSSI.isEmpty){
+            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+            let rssi = hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+            let mappedRSSI = mapNumber(rssi, inMin: -127, inMax: -20, outMin: 1.0, outMax: 0.0)
+
+            print(mappedRSSI)
+            cell.detailTextLabel?.text = String(mappedRSSI)
+            
+            let layer = CALayer()
+            
+            cell.deviceView.layer.sublayers = nil
+            layer.frame = cell.deviceView.bounds
+            layer.contentsGravity = kCAGravityCenter
+            layer.magnificationFilter = kCAFilterLinear
+            layer.geometryFlipped = false
+            let red = mapNumber(rssi, inMin: -20, inMax: -127, outMin: 0, outMax: 1.0)
+            let green = mapNumber(rssi, inMin: -20, inMax: -127, outMin: 1.0, outMax: 0)
+            layer.backgroundColor = UIColor(red: CGFloat(red), green: CGFloat(green), blue: 0.0, alpha: 1.0).CGColor
+            layer.opacity = 1.0
+            layer.hidden = false
+            layer.masksToBounds = false
         
-        cell.textLabel?.text = hm10serialManager.getDeviceName(deviceOfInterest)
-        cell.detailTextLabel?.text = String(hm10serialManager.getDeviceRSSI(deviceOfInterest))
-
-        // Configure the cell...
-
+            layer.cornerRadius = cell.deviceView.bounds.width / 2
+            layer.borderWidth = 1.0
+            layer.borderColor = UIColor.blackColor().CGColor
+            
+            // 6
+            layer.shadowOpacity = 0.75
+            layer.shadowOffset = CGSize(width: 0, height: 3)
+            layer.shadowRadius = 3.0
+            
+            cell.deviceView.layer.addSublayer(layer)
+        }
         return cell
     }
 
+    override func tableView(tableView: UITableView, didHighlightRowAtIndexPath indexPath: NSIndexPath) {
+        hm10serialManager.connectToDevice(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+    }
+    
     func callBack(){
+        // Invalidate timers and such.
         hm10serialManager.searchTimerTimeout()
+        discoveredDevicesNSUUIDSortedByRSSI = hm10serialManager.getSortedArraysBasedOnRSSI().nsuuids
+
+        // Reload the data, then end the refreshing controller
         self.tableView.reloadData()
-        print("YAY!")
+        refreshController.endRefreshing()
+    }
+
+    func refreshTableOnPullDown() {
+        hm10serialManager.search(self, nameOfCallback: "callBack", timeoutSecs: 1.0)
+    }
+    
+    func mapNumber(x: Int, inMin: Double, inMax: Double, outMin: Double, outMax: Double) -> Double {
+        let y = Double(x)
+        return ((y - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
     }
 
     /*
@@ -117,4 +174,21 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
     }
     */
 
+}
+
+class devicesCell: UITableViewCell {
+    
+
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var deviceView: UIView!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+    }
+    
+    override func setSelected(selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+    }
+    
 }

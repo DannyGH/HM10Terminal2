@@ -15,11 +15,13 @@ protocol bleSerialDelegate {
 
 class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
+    // Delegate for search updates.
     var delegate:bleSerialDelegate? = nil
     
     var activeCentralManager = CBCentralManager()
     var activePeripheralManager = CBPeripheralManager()
     var peripheralDevice: CBPeripheral?
+    var lastConnectedPeripheralNSUUID: NSUUID?
     
     // Initialize the activeCentralManagerState
     var activeCentralManagerState: CBCentralManagerState?
@@ -27,6 +29,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     // Search properities.
     private var searchComplete: Bool = false
     var searchTimeoutTimer: NSTimer = NSTimer()
+    var reconnectTimer: NSTimer = NSTimer()
     
     // Device descriptors for discovered devices.
     var discoveredDeviceList: Dictionary<NSUUID, CBPeripheral> = Dictionary()
@@ -35,11 +38,25 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     private var discoveredDeviceListUUIDString: Dictionary<NSUUID, String> = Dictionary()
     private var discoveredDeviceListNameString: Dictionary<NSUUID, String> = Dictionary()
     
-
     // Device descriptors for connected device.
     private var connectedPeripheralServices: Array<CBService> = Array()
     private var connectedPeripheralCharacteristics: Array<CBCharacteristic> = Array()
     private var connectedPeripheralCharacteristicsDescriptors: Array<CBDescriptor> = Array()
+    
+    // Behavioral options.
+        private var connectionsLimit = 1
+        private var connectionCounter = 0
+        // Reconnect
+        private var automaticReconnectOnDisconnect = true
+        private var timeBeforeAttemptingReconnectOnDisconnect = 1.0
+        private var numberOfRetriesOnDisconnect = 3
+    
+        private var automaticConnectionRetryOnFail = true
+        private var timeBeforeAttemptingReconnectOnConnectionFail = 1.0
+        private var numberOfRetriesAfterConnectionFail = 3
+
+        private var retryIndexOnDisconnect = 0
+        private var retryIndexOnFail = 0
     
     override init(){
         super.init()
@@ -50,6 +67,25 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         activeCentralManager = CBCentralManager(delegate: self, queue:  dispatch_get_main_queue())
     }
     
+    // #MARK: Behavior defining methods.
+    func setMutipleConnections(connectionLimit: Int){
+        connectionsLimit = connectionLimit
+    }
+    
+    func setAutomaticReconnectOnDisconnect(flag: Bool, tries: Int, timeBetweenTries: Double){
+        automaticReconnectOnDisconnect = flag
+        timeBeforeAttemptingReconnectOnDisconnect = timeBetweenTries
+        numberOfRetriesOnDisconnect = tries
+    }
+    
+    func setRetryConnectAfterFail(flag: Bool, tries: Int, timeBetweenTries: Double){
+        automaticConnectionRetryOnFail = flag
+        timeBeforeAttemptingReconnectOnConnectionFail = timeBetweenTries
+        numberOfRetriesAfterConnectionFail = tries
+    }
+    
+
+    // #MARK: Central Manager init.
     func centralManagerDidUpdateState(central: CBCentralManager) {
         
         // Make sure the iOS BLE device state status is updated.
@@ -66,19 +102,6 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
-    func centralManager(central: CBCentralManager, didDiscoverPeripheral peripheral: CBPeripheral, advertisementData: [String : AnyObject], RSSI: NSNumber) {
-        
-        // Let's get all the information about the discovered devices.
-        discoveredDeviceList.updateValue(peripheral, forKey: peripheral.identifier)
-        discoveredDeviceListRSSI.updateValue(RSSI, forKey: peripheral.identifier)
-        discoveredDeviceListAdvertisementData.updateValue(advertisementData, forKey: peripheral.identifier)
-        discoveredDeviceListUUIDString.updateValue(peripheral.identifier.UUIDString, forKey: peripheral.identifier)
-        if let name = peripheral.name {
-            discoveredDeviceListNameString.updateValue(name, forKey: peripheral.identifier)
-        }
-    }
-    
-
     // #MARK: Get discovered but unconnected device info
     func getNumberOfDiscoveredDevices()->Int{
         return discoveredDeviceList.count
@@ -109,6 +132,40 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
+    func getSortedArraysBasedOnRSSI()-> (nsuuids: Array<NSUUID>, rssies: Array<NSNumber>){
+
+        // Bubble-POP! :)
+        var rssies = Array(discoveredDeviceListRSSI.values)
+        var nsuuids = Array(discoveredDeviceListRSSI.keys)
+        let countOfKeys = discoveredDeviceListRSSI.keys.count
+        
+        var x = 0
+        var y = 0
+        //var bubblePop = true
+        
+        while(x < countOfKeys)
+        {
+            while(y < countOfKeys - 1)
+            {
+                if(Int(rssies[y]) < Int(rssies[y+1]))
+                {
+                    let temp1 = Int(rssies[y+1])
+                    let temp2 = nsuuids[y+1]
+
+                    rssies[y+1] = Int(rssies[y]);
+                    nsuuids[y+1] = nsuuids[y]
+                    
+                    rssies[y] = temp1
+                    nsuuids[y] = temp2
+                }
+                y++
+            }
+            x++
+        }
+        return (nsuuids, rssies)
+    }
+    
+    
     func getDeviceState()->Int{
         // Provide the raw state of the device.
         return activeCentralManager.state.rawValue
@@ -116,8 +173,45 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
 
     // #MARK: Search for devices
+    func centralManager(central: CBCentralManager, didDiscoverPeripheral peripheral: CBPeripheral, advertisementData: [String : AnyObject], RSSI: NSNumber) {
+        
+        // Let's get all the information about the discovered devices.
+        discoveredDeviceList.updateValue(peripheral, forKey: peripheral.identifier)
+        discoveredDeviceListRSSI.updateValue(RSSI, forKey: peripheral.identifier)
+        discoveredDeviceListAdvertisementData.updateValue(advertisementData, forKey: peripheral.identifier)
+        discoveredDeviceListUUIDString.updateValue(peripheral.identifier.UUIDString, forKey: peripheral.identifier)
+        if let name = peripheral.name {
+            discoveredDeviceListNameString.updateValue(name, forKey: peripheral.identifier)
+        }
+    }
+    
     func search(targetObject: AnyObject, nameOfCallback: String, timeoutSecs: NSTimeInterval){
+       
+        switch activeCentralManager.state {
+            case CBCentralManagerState.Unknown:
+                print("Unknown")
+                break
+            case CBCentralManagerState.Resetting:
+                print("Resetting")
+                break
+            case CBCentralManagerState.Unsupported:
+                print("Unsupported")
+                break
+            case CBCentralManagerState.Unauthorized:
+                print("Unauthorized")
+                break
+            case CBCentralManagerState.PoweredOff:
+                print("PoweredOff")
+                break
+            case CBCentralManagerState.PoweredOn:
+                print("On")
+                break
+//            default:
+//                print("Tried to search, but failed state switch.")
+        }
+        
         searchComplete = false
+        clearDiscoveredDevices()
         activeCentralManager = CBCentralManager(delegate: self, queue: nil)
         searchTimeoutTimer = NSTimer.scheduledTimerWithTimeInterval(timeoutSecs, target: targetObject, selector: Selector(nameOfCallback), userInfo: nil, repeats: false)
     }
@@ -131,19 +225,34 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     // #MARK: Connect to device
     func connectToDevice(deviceNSUUID: NSUUID) -> Bool {
+
+        // Remember NSUUID
+        lastConnectedPeripheralNSUUID = deviceNSUUID
         
         if(discoveredDeviceList.isEmpty){
             return false
         }
         else {
-            if let deviceToConnect = discoveredDeviceList[deviceNSUUID] {
-                activeCentralManager.connectPeripheral(deviceToConnect, options: nil)
+            if(connectionCounter < connectionsLimit){
+                if let deviceToConnect = discoveredDeviceList[deviceNSUUID] {
+                    activeCentralManager.connectPeripheral(deviceToConnect, options: nil)
+                }
+            }
+            else
+            {
+                print("Too many connections")
+            }
+            if(automaticReconnectOnDisconnect){
+                retryIndexOnDisconnect = 0
             }
         }
         return true
     }
     
     func centralManager(central: CBCentralManager, didConnectPeripheral peripheral: CBPeripheral) {
+
+        // Add a peripheral to number connected.
+        connectionCounter++
 
         peripheralDevice = peripheral
         peripheralDevice?.delegate = self
@@ -161,7 +270,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         // Look for set characteristics.
         
         // If not, do below.
-        
+
         if let peripheralDevice = peripheralDevice {
             if let serviceArray = peripheralDevice.services {
                 for service in serviceArray {
@@ -196,8 +305,43 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 connectedPeripheralCharacteristicsDescriptors.append(descriptors)
             }
         }
-        
         // End of the line.
+    }
+    
+    func centralManager(central: CBCentralManager, didFailToConnectPeripheral peripheral: CBPeripheral, error: NSError?) {
+        // If we fail to connect, don't remember this device.
+
+        if(automaticConnectionRetryOnFail && retryIndexOnFail < numberOfRetriesAfterConnectionFail){
+            reconnectTimer = NSTimer.scheduledTimerWithTimeInterval(timeBeforeAttemptingReconnectOnConnectionFail, target: self, selector: Selector("reconnectTimerExpired"), userInfo: nil, repeats: false)
+        }
+        else {
+            lastConnectedPeripheralNSUUID = nil
+        }
+    }
+    
+    func clearDiscoveredDevices(){
+        // Device descriptors for discovered devices.
+        discoveredDeviceList.removeAll()
+        discoveredDeviceListRSSI.removeAll()
+        discoveredDeviceListAdvertisementData.removeAll()
+        discoveredDeviceListUUIDString.removeAll()
+        discoveredDeviceListNameString.removeAll()
+    }
+    
+    // #MARK: Connection Lost.
+    func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
+        // Add a peripheral to number connected.
+        connectionCounter--
+        if(automaticReconnectOnDisconnect){
+            reconnectTimer = NSTimer.scheduledTimerWithTimeInterval(timeBeforeAttemptingReconnectOnDisconnect, target: self, selector: Selector("reconnectTimerExpired"), userInfo: nil, repeats: false)
+        }
+        
+    }
+    
+    func reconnectTimerExpired(){
+        if let lastConnectedPeripheralNSUUID = lastConnectedPeripheralNSUUID {
+            connectToDevice(lastConnectedPeripheralNSUUID)
+        }
     }
     
     // #MARK: Debug info.
@@ -222,4 +366,20 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         
     }
 
+
+}
+
+extension CBCentralManagerState {
+
+    // This is meant to build the CBCentralManagerState -- do I want more states?
+    //var Hyper: Int {return 8}
+}
+
+extension CBPeripheralManager {
+
+    // This adds a state feature to the peripheralManager.
+    enum State: Int {
+        case disconnected = 0
+        case connected
+    }
 }
