@@ -9,8 +9,9 @@
 import Foundation
 import CoreBluetooth
 
-protocol bleSerialDelegate {
-    func searchTimerExpired(controller: AnyObject)
+@objc protocol bleSerialDelegate {
+    optional func searchTimerExpired(controller: AnyObject)
+    optional func deviceStatusChanged(controller: AnyObject)
 }
 
 
@@ -216,8 +217,6 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     func search(targetObject: AnyObject, nameOfCallback: String, timeoutSecs: NSTimeInterval){
-
-        
         searchComplete = false
         clearDiscoveredDevices()
         activeCentralManager = CBCentralManager(delegate: self, queue: nil)
@@ -228,7 +227,9 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         searchTimeoutTimer.invalidate()
         searchComplete = true
         printDiscoveredDeviceListInfo()
-        delegate!.searchTimerExpired(self)
+        if let delegateSearchTimerExpired = delegate?.searchTimerExpired?(self){
+//            delegateSearchTimerExpired = s
+        }
     }
     
     // #MARK: Connect to device
@@ -346,7 +347,11 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     // #MARK: Connection Lost.
     func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
-
+        
+        // If connection is lost, remove it from the connected device dictionary.
+        connectedPeripherals.removeValueForKey(peripheral.identifier)
+        print("Lost connection to: \(peripheral.identifier)")
+        
         if(automaticReconnectOnDisconnect){
             activePeripheralManager.state
             reconnectTimer = NSTimer.scheduledTimerWithTimeInterval(timeBeforeAttemptingReconnectOnDisconnect, target: self, selector: Selector("reconnectTimerExpired"), userInfo: nil, repeats: false)

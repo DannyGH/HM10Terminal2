@@ -17,8 +17,13 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
     var refreshController = UIRefreshControl()
     
     func searchTimerExpired(controller: AnyObject) {
-
+        
     }
+    
+    func deviceStatusChanged(controller: AnyObject){
+        
+    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,50 +75,62 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
 
         // Configure the cell if there are any discovered devices.
         if(!discoveredDevicesNSUUIDSortedByRSSI.isEmpty){
-            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
-            let rssi = hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
-            let mappedRSSI = mapNumber(rssi, inMin: -127, inMax: -20, outMin: 1.0, outMax: 0.0)
 
-            print(mappedRSSI)
-            cell.detailTextLabel?.text = String(mappedRSSI)
+            var currentStatusString: String = ""
             
+            if(hm10serialManager.alreadyConnected(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])){
+                currentStatusString = " -- Connected"
+            }
+            
+            // Create a custom cell.
+            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + currentStatusString
+
+            // Get discovered device's RSSI.
+            let rssi = hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+            cell.detailTextLabel?.text = String(rssi)
+
+            // Map RSSI to color scheme.
+            let red = mapNumber(rssi, inMin: -20, inMax: -127, outMin: 0, outMax: 1.0)
+            let green = mapNumber(rssi, inMin: -20, inMax: -127, outMin: 1.0, outMax: 0)
+            
+            // Setup RSSI graphic.
             let layer = CALayer()
-            
             cell.deviceView.layer.sublayers = nil
             layer.frame = cell.deviceView.bounds
             layer.contentsGravity = kCAGravityCenter
             layer.magnificationFilter = kCAFilterLinear
             layer.geometryFlipped = false
-            let red = mapNumber(rssi, inMin: -20, inMax: -127, outMin: 0, outMax: 1.0)
-            let green = mapNumber(rssi, inMin: -20, inMax: -127, outMin: 1.0, outMax: 0)
             layer.backgroundColor = UIColor(red: CGFloat(red), green: CGFloat(green), blue: 0.0, alpha: 1.0).CGColor
             layer.opacity = 1.0
             layer.hidden = false
             layer.masksToBounds = false
-        
             layer.cornerRadius = cell.deviceView.bounds.width / 2
             layer.borderWidth = 1.0
             layer.borderColor = UIColor.blackColor().CGColor
-            
-            // 6
             layer.shadowOpacity = 0.75
             layer.shadowOffset = CGSize(width: 0, height: 3)
             layer.shadowRadius = 3.0
             
+            // Add RSSI graphic.
             cell.deviceView.layer.addSublayer(layer)
         }
         return cell
     }
 
     override func tableView(tableView: UITableView, didHighlightRowAtIndexPath indexPath: NSIndexPath) {
+        
+        // Connect to the selected device.
         hm10serialManager.connectToDevice(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+        if let navigationController = navigationController {
+            //navigationController.popToRootViewControllerAnimated(true)
+        }
     }
     
     func callBack(){
+        
         // Invalidate timers and such.
         hm10serialManager.searchTimerTimeout()
         discoveredDevicesNSUUIDSortedByRSSI = hm10serialManager.getSortedArraysBasedOnRSSI().nsuuids
-
         
         // Reload the data, then end the refreshing controller
         self.tableView.reloadData()
@@ -121,6 +138,8 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
     }
 
     func refreshTableOnPullDown() {
+
+        // Refresh device list.
         hm10serialManager.search(self, nameOfCallback: "callBack", timeoutSecs: 1.0)
     }
     
