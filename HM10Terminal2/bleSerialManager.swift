@@ -209,12 +209,11 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     func getAdvDeviceServiceData(deviceOfInterest: NSUUID)->String{
         if let discoveredDevicekCBAdvDataServiceData = discoveredDevicekCBAdvDataServiceData[deviceOfInterest] {
-            let data = discoveredDevicekCBAdvDataServiceData as? NSData
-            if let data = data {
-                let dataString = NSString(data: data, encoding: NSUTF16StringEncoding) as? String
-                if let dataString = dataString {
-                    return dataString
-                }
+            let dictionaryCast = discoveredDevicekCBAdvDataServiceData as? Dictionary<CBUUID, NSData>
+            if let dictionaryCast = dictionaryCast {
+                let arrayOfKeys = Array(dictionaryCast.keys)
+                print(arrayOfKeys)
+
             }
         }
         return ""
@@ -293,7 +292,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         // Advertising data.
         discoveredDevicekCBAdvDataIsConnectable.updateValue(advertisementData[CBAdvertisementDataIsConnectable]!, forKey: peripheral.identifier)
         discoveredDevicekCBAdvDataManufacturerData.updateValue(advertisementData[CBAdvertisementDataManufacturerDataKey]!, forKey: peripheral.identifier)
-//        discoveredDevicekCBAdvDataServiceData.updateValue(advertisementData[CBAdvertisementDataServiceDataKey] as! String, forKey: peripheral.identifier)
+        discoveredDevicekCBAdvDataServiceData.updateValue(advertisementData[CBAdvertisementDataServiceDataKey] as! Dictionary<CBUUID, NSData>, forKey: peripheral.identifier)
 //        discoveredDevicekCBAdvDataLocalName.updateValue(advertisementData[CBAdvertisementDataLocalNameKey] as! String, forKey: peripheral.identifier)
 //        discoveredDevicekCBAdvDataServiceUUIDs.updateValue(advertisementData[CBAdvertisementDataServiceUUIDsKey] as! String, forKey: peripheral.identifier)
 //        discoveredDevicekCBAdvSolicitedServiceUUID.updateValue(advertisementData[CBAdvertisementDataSolicitedServiceUUIDsKey] as! String, forKey: peripheral.identifier)
