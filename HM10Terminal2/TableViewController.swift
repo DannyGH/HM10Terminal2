@@ -17,7 +17,7 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
     var refreshController = UIRefreshControl()
     
     func searchTimerExpired() {
-        print("MADE IT!")
+
         
         // Invalidate timers and such.
         discoveredDevicesNSUUIDSortedByRSSI = hm10serialManager.getSortedArraysBasedOnRSSI().nsuuids
@@ -92,8 +92,12 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
                 currentStatusString = " -- Connected"
             }
             
+
+            let advData = String(hm10serialManager.getAdvDeviceServiceData(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
+            print(advData)
+            
             // Create a custom cell.
-            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + currentStatusString
+            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + " " + advData + currentStatusString
 
             // Get discovered device's RSSI.
             let rssi = hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])

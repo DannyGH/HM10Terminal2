@@ -38,6 +38,15 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     private var discoveredDeviceListAdvertisementData: Dictionary<NSUUID, [String : AnyObject]> = Dictionary()
     private var discoveredDeviceListUUIDString: Dictionary<NSUUID, String> = Dictionary()
     private var discoveredDeviceListNameString: Dictionary<NSUUID, String> = Dictionary()
+
+    // Discovered device advertisement data.
+    private var discoveredDevicekCBAdvDataManufacturerData: Dictionary<NSUUID, AnyObject> = Dictionary()
+    private var discoveredDevicekCBAdvDataIsConnectable: Dictionary<NSUUID, AnyObject> = Dictionary()
+    private var discoveredDevicekCBAdvDataServiceUUIDs: Dictionary<NSUUID, AnyObject> = Dictionary()
+    private var discoveredDevicekCBAdvDataTxPowerLevel: Dictionary<NSUUID, AnyObject> = Dictionary()
+    private var discoveredDevicekCBAdvDataServiceData: Dictionary<NSUUID, AnyObject> = Dictionary()
+    private var discoveredDevicekCBAdvSolicitedServiceUUID: Dictionary<NSUUID, AnyObject> = Dictionary()
+    private var discoveredDevicekCBAdvDataLocalName: Dictionary<NSUUID, AnyObject> = Dictionary()
     
     // Device descriptors for connected device.
     private var connectedPeripherals: Dictionary<NSUUID, CBPeripheral> = Dictionary()
@@ -53,7 +62,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         case PoweredOff
         case PoweredOn
         case Reconnecting
-        
+
     }
     
     // Initialize the activeCentralManagerState
@@ -164,6 +173,74 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
+    func getAdvDeviceConnectable(deviceOfInterest: NSUUID)->Bool{
+        if let discoveredDevicekCBAdvDataIsConnectable = discoveredDevicekCBAdvDataIsConnectable[deviceOfInterest] {
+            let connectableFlag = discoveredDevicekCBAdvDataIsConnectable as? Bool
+            if let connectableFlag = connectableFlag {
+                return connectableFlag
+            }
+        }
+        return false
+    }
+    
+    func getAdvDeviceName(deviceOfInterest: NSUUID)->String{
+        if let discoveredDevicekCBAdvDataLocalName = discoveredDevicekCBAdvDataLocalName[deviceOfInterest] {
+            let nameAsString = discoveredDevicekCBAdvDataLocalName as? String
+            if let nameAsString = nameAsString {
+                return nameAsString
+            }
+        }
+        return ""
+    }
+    
+    
+    func getAdvDeviceManufactureData(deviceOfInterest: NSUUID)->String{
+        if let discoveredDevicekCBAdvDataManufacturerData = discoveredDevicekCBAdvDataManufacturerData[deviceOfInterest] {
+            let data = discoveredDevicekCBAdvDataManufacturerData as? NSData
+            if let data = data {
+                let dataString = NSString(data: data, encoding: NSUTF16StringEncoding) as? String
+                if let dataString = dataString {
+                    return dataString
+                }
+            }
+        }
+        return ""
+    }
+
+    func getAdvDeviceServiceData(deviceOfInterest: NSUUID)->String{
+        if let discoveredDevicekCBAdvDataServiceData = discoveredDevicekCBAdvDataServiceData[deviceOfInterest] {
+            let data = discoveredDevicekCBAdvDataServiceData as? NSData
+            if let data = data {
+                let dataString = NSString(data: data, encoding: NSUTF16StringEncoding) as? String
+                if let dataString = dataString {
+                    return dataString
+                }
+            }
+        }
+        return ""
+    }
+//
+//    func getAdvDeviceServiceUUID(deviceOfInterest: NSUUID)->String{
+//        if let discoveredDevicekCBAdvDataServiceUUIDs = discoveredDevicekCBAdvDataServiceUUIDs[deviceOfInterest] {
+//            return discoveredDevicekCBAdvDataServiceUUIDs as String
+//        }
+//        return ""
+//    }
+//    
+//    func getAdvTxPowerLevel(deviceOfInterest: NSUUID)->String{
+//        if let discoveredDevicekCBAdvDataTxPowerLevel = discoveredDevicekCBAdvDataTxPowerLevel[deviceOfInterest] {
+//            return discoveredDevicekCBAdvDataTxPowerLevel as String
+//        }
+//        return ""
+//    }
+//    
+//    func getAdvSolicitedUUID(deviceOfInterest: NSUUID)->String{
+//        if let discoveredDevicekCBAdvSolicitedServiceUUID = discoveredDevicekCBAdvSolicitedServiceUUID[deviceOfInterest] {
+//            return discoveredDevicekCBAdvSolicitedServiceUUID as String
+//        }
+//        return ""
+//    }
+    
     func getSortedArraysBasedOnRSSI()-> (nsuuids: Array<NSUUID>, rssies: Array<NSNumber>){
 
         // Bubble-POP! :)
@@ -212,6 +289,26 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         discoveredDeviceListRSSI.updateValue(RSSI, forKey: peripheral.identifier)
         discoveredDeviceListAdvertisementData.updateValue(advertisementData, forKey: peripheral.identifier)
         discoveredDeviceListUUIDString.updateValue(peripheral.identifier.UUIDString, forKey: peripheral.identifier)
+        
+        // Advertising data.
+        discoveredDevicekCBAdvDataIsConnectable.updateValue(advertisementData[CBAdvertisementDataIsConnectable]!, forKey: peripheral.identifier)
+        discoveredDevicekCBAdvDataManufacturerData.updateValue(advertisementData[CBAdvertisementDataManufacturerDataKey]!, forKey: peripheral.identifier)
+//        discoveredDevicekCBAdvDataServiceData.updateValue(advertisementData[CBAdvertisementDataServiceDataKey] as! String, forKey: peripheral.identifier)
+//        discoveredDevicekCBAdvDataLocalName.updateValue(advertisementData[CBAdvertisementDataLocalNameKey] as! String, forKey: peripheral.identifier)
+//        discoveredDevicekCBAdvDataServiceUUIDs.updateValue(advertisementData[CBAdvertisementDataServiceUUIDsKey] as! String, forKey: peripheral.identifier)
+//        discoveredDevicekCBAdvSolicitedServiceUUID.updateValue(advertisementData[CBAdvertisementDataSolicitedServiceUUIDsKey] as! String, forKey: peripheral.identifier)
+//        discoveredDevicekCBAdvDataTxPowerLevel.updateValue(advertisementData[CBAdvertisementDataTxPowerLevelKey] as! String, forKey: peripheral.identifier)
+//        
+        // Clear any connections.  (Strangely, if a search is initiated, all devices are disconnected without
+        // didDisconnectPeripheral() being called.
+        connectedPeripheralServices.removeAll()
+        connectedPeripheralCharacteristics.removeAll()
+        connectedPeripheralCharacteristicsDescriptors.removeAll()
+        
+        print(CBAdvertisementDataLocalNameKey)
+        
+        print(advertisementData)
+        
         if let name = peripheral.name {
             discoveredDeviceListNameString.updateValue(name, forKey: peripheral.identifier)
         }
@@ -357,7 +454,15 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         discoveredDeviceListUUIDString.removeAll()
         discoveredDeviceListNameString.removeAll()
     }
-    
+
+    func clearDiscoveredDevicesAdvertisementData(){
+        connectedPeripherals.removeAll()
+        connectedPeripheralServices.removeAll()
+        connectedPeripheralCharacteristics.removeAll()
+        connectedPeripheralCharacteristicsDescriptors.removeAll()
+        
+    }
+
     func clearConnectedDevices(){
         // Clear connected devices
         connectedPeripherals.removeAll()
@@ -365,6 +470,8 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         connectedPeripheralCharacteristics.removeAll()
         connectedPeripheralCharacteristicsDescriptors.removeAll()
     }
+    
+
     
     // #MARK: Connection Lost.
     func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
