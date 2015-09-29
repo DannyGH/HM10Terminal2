@@ -16,14 +16,24 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
 
     var refreshController = UIRefreshControl()
     
-    func searchTimerExpired(controller: AnyObject) {
+    func searchTimerExpired() {
+        print("MADE IT!")
         
+        // Invalidate timers and such.
+        discoveredDevicesNSUUIDSortedByRSSI = hm10serialManager.getSortedArraysBasedOnRSSI().nsuuids
+        
+        // Reload the data, then end the refreshing controller
+        self.tableView.reloadData()
+        refreshController.endRefreshing()
     }
     
-    func deviceStatusChanged(controller: AnyObject){
+    func deviceStatusChanged(){
         
     }
 
+    func connectedToDevice() {
+        self.tableView.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,7 +58,7 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
         hm10serialManager.setRetryConnectAfterFail(true, tries: 3, timeBetweenTries: 0.5)
         
         // Begin search automatically.
-        hm10serialManager.search(self, nameOfCallback: "callBack", timeoutSecs: 1.0)
+        hm10serialManager.search(1.0)
     }
 
     override func didReceiveMemoryWarning() {
@@ -121,26 +131,16 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
         
         // Connect to the selected device.
         hm10serialManager.connectToDevice(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
-        if let navigationController = navigationController {
+//        if let navigationController = navigationController {
             //navigationController.popToRootViewControllerAnimated(true)
-        }
+///        }
+
     }
     
-    func callBack(){
-        
-        // Invalidate timers and such.
-        hm10serialManager.searchTimerTimeout()
-        discoveredDevicesNSUUIDSortedByRSSI = hm10serialManager.getSortedArraysBasedOnRSSI().nsuuids
-        
-        // Reload the data, then end the refreshing controller
-        self.tableView.reloadData()
-        refreshController.endRefreshing()
-    }
-
     func refreshTableOnPullDown() {
 
         // Refresh device list.
-        hm10serialManager.search(self, nameOfCallback: "callBack", timeoutSecs: 1.0)
+        hm10serialManager.search(1.0)
     }
     
     func mapNumber(x: Int, inMin: Double, inMax: Double, outMin: Double, outMax: Double) -> Double {

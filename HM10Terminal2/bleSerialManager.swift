@@ -10,8 +10,9 @@ import Foundation
 import CoreBluetooth
 
 @objc protocol bleSerialDelegate {
-    optional func searchTimerExpired(controller: AnyObject)
-    optional func deviceStatusChanged(controller: AnyObject)
+    optional func searchTimerExpired()
+    optional func deviceStatusChanged()
+    optional func connectedToDevice()
 }
 
 
@@ -216,19 +217,22 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
-    func search(targetObject: AnyObject, nameOfCallback: String, timeoutSecs: NSTimeInterval){
+    func search(timeoutSecs: NSTimeInterval){
         searchComplete = false
         clearDiscoveredDevices()
+        // Strange.  If a search for peripherals is initiated it cancels all connections
+        // without firing didDisconnectPeripheral.  This compensates.
+        clearConnectedDevices()
         activeCentralManager = CBCentralManager(delegate: self, queue: nil)
-        searchTimeoutTimer = NSTimer.scheduledTimerWithTimeInterval(timeoutSecs, target: targetObject, selector: Selector(nameOfCallback), userInfo: nil, repeats: false)
+        searchTimeoutTimer = NSTimer.scheduledTimerWithTimeInterval(timeoutSecs, target: self, selector: Selector("searchTimerExpire"), userInfo: nil, repeats: false)
     }
     
-    func searchTimerTimeout(){
+    func searchTimerExpire(){
         searchTimeoutTimer.invalidate()
         searchComplete = true
         printDiscoveredDeviceListInfo()
-        if let delegateSearchTimerExpired = delegate?.searchTimerExpired?(self){
-//            delegateSearchTimerExpired = s
+        if let searchTimerExpired = delegate?.searchTimerExpired!(){
+            searchTimerExpired
         }
     }
     
@@ -279,6 +283,15 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         
         if let peripheralDevice = peripheralDevice {
             peripheralDevice.discoverServices(nil)
+        }
+        
+        if let connectedToDevice = delegate?.connectedToDevice!(){
+            connectedToDevice
+        }
+        else {
+        
+            // Handle if no delegate is setup.
+            
         }
     }
     
@@ -343,6 +356,14 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         discoveredDeviceListAdvertisementData.removeAll()
         discoveredDeviceListUUIDString.removeAll()
         discoveredDeviceListNameString.removeAll()
+    }
+    
+    func clearConnectedDevices(){
+        // Clear connected devices
+        connectedPeripherals.removeAll()
+        connectedPeripheralServices.removeAll()
+        connectedPeripheralCharacteristics.removeAll()
+        connectedPeripheralCharacteristicsDescriptors.removeAll()
     }
     
     // #MARK: Connection Lost.
