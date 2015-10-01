@@ -90,11 +90,11 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
                 currentStatusString = " -- Connected"
             }
 
-//            let advData = (hm10serialManager.getAdvDeviceServiceUUID(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
-//            print(advData)
+            let advData = (hm10serialManager.getAdvDeviceServiceUUIDasNSArray(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
+            print(advData)
             
             // Create a custom cell.
-            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + currentStatusString//" " + advData + currentStatusString
+            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + " " + String(advData[0]) + currentStatusString
 
             // Get discovered device's RSSI.
             let rssi = hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])

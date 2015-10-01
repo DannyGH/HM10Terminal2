@@ -22,6 +22,9 @@ import CoreBluetooth
 // 0. Finish advertisement data.  Do hell knows what with iBeacon crap.
 // 1. Running in the background options.
 // 2. Alert view for warning about losing connections.
+// 3. Serial Buffer.
+// 4. Serial data recieved optional delegate.
+// 5.
 
 
 
@@ -256,24 +259,30 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         return [""]
     }
 
-    func getAdvDeviceServiceUUID(deviceOfInterest: NSUUID)->String{
+    func getAdvDeviceServiceUUIDasNSArray(deviceOfInterest: NSUUID)->NSArray{
         if let discoveredDevicekCBAdvDataServiceUUIDs = discoveredDevicekCBAdvDataServiceUUIDs[deviceOfInterest] {
-            let discoveredDevicekCBAdvDataServiceUUIDStrings = discoveredDevicekCBAdvDataServiceUUIDs as? String
+            let discoveredDevicekCBAdvDataServiceUUIDStrings = discoveredDevicekCBAdvDataServiceUUIDs as? NSArray
             if let discoveredDevicekCBAdvDataServiceUUIDStrings = discoveredDevicekCBAdvDataServiceUUIDStrings
             {
                 return discoveredDevicekCBAdvDataServiceUUIDStrings
             }
         }
-        return ""
+        return []
     }
+    
+    
 
-//    func getAdvTxPowerLevel(deviceOfInterest: NSUUID)->String{
-//        if let discoveredDevicekCBAdvDataTxPowerLevel = discoveredDevicekCBAdvDataTxPowerLevel[deviceOfInterest] {
-//            return discoveredDevicekCBAdvDataTxPowerLevel as String
-//        }
-//        return ""
-//    }
-//    
+    func getAdvTxPowerLevel(deviceOfInterest: NSUUID)->Int{
+        if let discoveredDevicekCBAdvDataTxPowerLevel = discoveredDevicekCBAdvDataTxPowerLevel[deviceOfInterest] {
+            let txPowerLevelInt = discoveredDevicekCBAdvDataTxPowerLevel as? Int
+            if let txPowerLevelInt = txPowerLevelInt
+            {
+                return txPowerLevelInt
+            }
+        }
+        return 0
+    }
+    
 //    func getAdvSolicitedUUID(deviceOfInterest: NSUUID)->String{
 //        if let discoveredDevicekCBAdvSolicitedServiceUUID = discoveredDevicekCBAdvSolicitedServiceUUID[deviceOfInterest] {
 //            return discoveredDevicekCBAdvSolicitedServiceUUID as String
@@ -370,10 +379,23 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             print("Nil found unwrapping AdvertisementDataLocalNameKey")
         }
 
-//        discoveredDevicekCBAdvDataServiceUUIDs.updateValue(advertisementData[CBAdvertisementDataServiceUUIDsKey] as! String, forKey: peripheral.identifier)
+        let AdvertisementDataTxPowerLevelKey = advertisementData[CBAdvertisementDataTxPowerLevelKey]
+        if let AdvertisementDataTxPowerLevelKey = AdvertisementDataTxPowerLevelKey{
+            discoveredDevicekCBAdvDataTxPowerLevel.updateValue(AdvertisementDataTxPowerLevelKey, forKey: peripheral.identifier)
+        }
+        else
+        {
+            print("Nil found unwrapping AdvertisementDataLocalNameKey")
+        }
+        
+        let AdvertisementDataServiceUUIDsKey = advertisementData[CBAdvertisementDataServiceUUIDsKey]
+        if let AdvertisementDataServiceUUIDsKey = AdvertisementDataServiceUUIDsKey {
+            discoveredDevicekCBAdvDataServiceUUIDs.updateValue(AdvertisementDataServiceUUIDsKey, forKey: peripheral.identifier)
+        }
+
 //        discoveredDevicekCBAdvSolicitedServiceUUID.updateValue(advertisementData[CBAdvertisementDataSolicitedServiceUUIDsKey] as! String, forKey: peripheral.identifier)
-//        discoveredDevicekCBAdvDataTxPowerLevel.updateValue(advertisementData[CBAdvertisementDataTxPowerLevelKey] as! String, forKey: peripheral.identifier)
-//        
+
+
         // Clear any connections.  (Strangely, if a search is initiated, all devices are disconnected without
         // didDisconnectPeripheral() being called.
         connectedPeripheralServices.removeAll()
