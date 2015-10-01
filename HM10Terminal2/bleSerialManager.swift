@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreBluetooth
+//import CoreLocation
 
 @objc protocol bleSerialDelegate {
     optional func searchTimerExpired()
@@ -17,7 +18,17 @@ import CoreBluetooth
 
 
 
+// Things to add
+// 0. Finish advertisement data.  Do hell knows what with iBeacon crap.
+// 1. Running in the background options.
+// 2. Alert view for warning about losing connections.
+
+
+
 class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
+    
+//    let locationManager = CLLocationManager()
+//    var region: CLBeaconRegion?
     
     // Delegate for search updates.
     var delegate:bleSerialDelegate? = nil
@@ -92,7 +103,28 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 //        activeCentralManagerState = CBCentralManagerState.Unknown
         // Attach delegate
         activeCentralManager = CBCentralManager(delegate: self, queue:  dispatch_get_main_queue())
+        
+        
+        
+//        if let proximityUUID = NSUUID(UUIDString: "74278BDA-B644-4520-8F0C-720EAF059935") { // generated using uuidgen tool
+//            
+//            self.region = CLBeaconRegion(proximityUUID: proximityUUID, identifier: "HMSoft")
+//            if let region = self.region {
+//                locationManager.delegate = self
+//                
+//                if (CLLocationManager.authorizationStatus() != CLAuthorizationStatus.AuthorizedWhenInUse) {
+//                    locationManager.requestWhenInUseAuthorization()
+//                }
+//                
+//                locationManager.startRangingBeaconsInRegion(region)
+//            }
+//        }
     }
+
+//    func locationManager(manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], inRegion region: CLBeaconRegion) {
+//        print(beacons)    
+//    }
+
     
     // #MARK: Behavior defining methods.
     func setMutipleConnections(connectionLimit: Int){
@@ -207,25 +239,34 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         return ""
     }
 
-    func getAdvDeviceServiceData(deviceOfInterest: NSUUID)->String{
+    func getAdvDeviceServiceData(deviceOfInterest: NSUUID) -> Array<String>{
         if let discoveredDevicekCBAdvDataServiceData = discoveredDevicekCBAdvDataServiceData[deviceOfInterest] {
             let dictionaryCast = discoveredDevicekCBAdvDataServiceData as? Dictionary<CBUUID, NSData>
+            var cbuuidAsStringArray: Array<String> = []
             if let dictionaryCast = dictionaryCast {
-                let arrayOfKeys = Array(dictionaryCast.keys)
-                print(arrayOfKeys)
+                for CBUUID in dictionaryCast.values {
+                    let cbuuidString = NSString(data: CBUUID, encoding: NSUTF16StringEncoding)
+                    if let cbuuidString = cbuuidString {
+                        cbuuidAsStringArray.append(cbuuidString as String)
+                    }
+                }
+                return cbuuidAsStringArray
+            }
+        }
+        return [""]
+    }
 
+    func getAdvDeviceServiceUUID(deviceOfInterest: NSUUID)->String{
+        if let discoveredDevicekCBAdvDataServiceUUIDs = discoveredDevicekCBAdvDataServiceUUIDs[deviceOfInterest] {
+            let discoveredDevicekCBAdvDataServiceUUIDStrings = discoveredDevicekCBAdvDataServiceUUIDs as? String
+            if let discoveredDevicekCBAdvDataServiceUUIDStrings = discoveredDevicekCBAdvDataServiceUUIDStrings
+            {
+                return discoveredDevicekCBAdvDataServiceUUIDStrings
             }
         }
         return ""
     }
-//
-//    func getAdvDeviceServiceUUID(deviceOfInterest: NSUUID)->String{
-//        if let discoveredDevicekCBAdvDataServiceUUIDs = discoveredDevicekCBAdvDataServiceUUIDs[deviceOfInterest] {
-//            return discoveredDevicekCBAdvDataServiceUUIDs as String
-//        }
-//        return ""
-//    }
-//    
+
 //    func getAdvTxPowerLevel(deviceOfInterest: NSUUID)->String{
 //        if let discoveredDevicekCBAdvDataTxPowerLevel = discoveredDevicekCBAdvDataTxPowerLevel[deviceOfInterest] {
 //            return discoveredDevicekCBAdvDataTxPowerLevel as String
@@ -290,10 +331,45 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         discoveredDeviceListUUIDString.updateValue(peripheral.identifier.UUIDString, forKey: peripheral.identifier)
         
         // Advertising data.
-        discoveredDevicekCBAdvDataIsConnectable.updateValue(advertisementData[CBAdvertisementDataIsConnectable]!, forKey: peripheral.identifier)
-        discoveredDevicekCBAdvDataManufacturerData.updateValue(advertisementData[CBAdvertisementDataManufacturerDataKey]!, forKey: peripheral.identifier)
-        discoveredDevicekCBAdvDataServiceData.updateValue(advertisementData[CBAdvertisementDataServiceDataKey] as! Dictionary<CBUUID, NSData>, forKey: peripheral.identifier)
-//        discoveredDevicekCBAdvDataLocalName.updateValue(advertisementData[CBAdvertisementDataLocalNameKey] as! String, forKey: peripheral.identifier)
+        let AdvertisementDataIsConnectable = advertisementData[CBAdvertisementDataIsConnectable]
+        if let AdvertisementDataIsConnectable = AdvertisementDataIsConnectable {
+            discoveredDevicekCBAdvDataIsConnectable.updateValue(AdvertisementDataIsConnectable, forKey: peripheral.identifier)
+        }
+        else
+        {
+            print("Nil found unwrapping AdvertisementDataIsConnectable")
+        }
+
+
+        let AdvertisementDataManufacturerDataKey = advertisementData[CBAdvertisementDataManufacturerDataKey]
+        if let AdvertisementDataManufacturerDataKey = AdvertisementDataManufacturerDataKey{
+            discoveredDevicekCBAdvDataManufacturerData.updateValue(AdvertisementDataManufacturerDataKey, forKey: peripheral.identifier)
+        }
+        else
+        {
+            print("Nil found unwrapping AdvertisementDataManufacturerDataKey")
+        }
+
+
+        let AdvertisementDataServiceDataKey = advertisementData[CBAdvertisementDataServiceDataKey] as? Dictionary<CBUUID, NSData>
+        if let AdvertisementDataServiceDataKey = AdvertisementDataServiceDataKey {
+            discoveredDevicekCBAdvDataServiceData.updateValue(AdvertisementDataServiceDataKey, forKey: peripheral.identifier)
+        }
+        else
+        {
+            print("Nil found unwrapping AdvertisementDataServiceDataKey")
+        }
+
+        
+        let AdvertisementDataLocalNameKey = advertisementData[CBAdvertisementDataLocalNameKey]
+        if let AdvertisementDataLocalNameKey = AdvertisementDataLocalNameKey {
+            discoveredDevicekCBAdvDataLocalName.updateValue(AdvertisementDataLocalNameKey, forKey: peripheral.identifier)
+        }
+        else
+        {
+            print("Nil found unwrapping AdvertisementDataLocalNameKey")
+        }
+
 //        discoveredDevicekCBAdvDataServiceUUIDs.updateValue(advertisementData[CBAdvertisementDataServiceUUIDsKey] as! String, forKey: peripheral.identifier)
 //        discoveredDevicekCBAdvSolicitedServiceUUID.updateValue(advertisementData[CBAdvertisementDataSolicitedServiceUUIDsKey] as! String, forKey: peripheral.identifier)
 //        discoveredDevicekCBAdvDataTxPowerLevel.updateValue(advertisementData[CBAdvertisementDataTxPowerLevelKey] as! String, forKey: peripheral.identifier)
@@ -451,7 +527,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         discoveredDeviceListRSSI.removeAll()
         discoveredDeviceListAdvertisementData.removeAll()
         discoveredDeviceListUUIDString.removeAll()
-        discoveredDeviceListNameString.removeAll()
+        discoveredDeviceListNameString.removeAll()     
     }
 
     func clearDiscoveredDevicesAdvertisementData(){

@@ -7,10 +7,11 @@
 //
 
 import UIKit
+import CoreLocation
 
 let hm10serialManager = bleSerialManager()
 
-class ViewController: UIViewController, bleSerialDelegate {
+class ViewController: UIViewController, bleSerialDelegate, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +22,14 @@ class ViewController: UIViewController, bleSerialDelegate {
     
     override func viewWillAppear(animated: Bool) {
         hm10serialManager.delegate = self
+        
+
     }
 
+    override func viewDidAppear(animated: Bool) {
+
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

@@ -17,8 +17,6 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
     var refreshController = UIRefreshControl()
     
     func searchTimerExpired() {
-
-        
         // Invalidate timers and such.
         discoveredDevicesNSUUIDSortedByRSSI = hm10serialManager.getSortedArraysBasedOnRSSI().nsuuids
         
@@ -91,13 +89,12 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
             if(hm10serialManager.alreadyConnected(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])){
                 currentStatusString = " -- Connected"
             }
-            
 
-            let advData = String(hm10serialManager.getAdvDeviceServiceData(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
-            print(advData)
+//            let advData = (hm10serialManager.getAdvDeviceServiceUUID(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
+//            print(advData)
             
             // Create a custom cell.
-            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + " " + advData + currentStatusString
+            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + currentStatusString//" " + advData + currentStatusString
 
             // Get discovered device's RSSI.
             let rssi = hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
@@ -143,6 +140,17 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
     
     func refreshTableOnPullDown() {
 
+        let refreshAlert = UIAlertController(title: "Refresh", message: "All data will be lost.", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        refreshAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+            print("Handle Ok logic here")
+        }))
+        
+        refreshAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (action: UIAlertAction!) in
+            print("Handle Cancel Logic here")
+        }))
+        
+        presentViewController(refreshAlert, animated: true, completion: nil)
         // Refresh device list.
         hm10serialManager.search(1.0)
     }
