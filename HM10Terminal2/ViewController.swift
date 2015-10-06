@@ -15,13 +15,13 @@ class ViewController: UIViewController, bleSerialDelegate, CLLocationManagerDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        hm10serialManager.delegate = self    
+ 
         // Do any additional setup after loading the view, typically from a nib.
         
     }
     
     override func viewWillAppear(animated: Bool) {
-
+        hm10serialManager.delegate = self
     }
 
     override func viewDidAppear(animated: Bool) {

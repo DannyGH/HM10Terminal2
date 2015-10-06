@@ -56,7 +56,7 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
         hm10serialManager.setRetryConnectAfterFail(true, tries: 3, timeBetweenTries: 0.5)
         
         // Begin search automatically.
-        hm10serialManager.search(1.0)
+        hm10serialManager.search(3.0)
     }
 
     override func didReceiveMemoryWarning() {
@@ -90,12 +90,14 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
                 currentStatusString = " -- Connected"
             }
 
-            let advData = (hm10serialManager.getAdvDeviceServiceUUIDasNSArray(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
+            let advData = (hm10serialManager.getAdvSolicitedUUID(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
             print(advData)
             
-            // Create a custom cell.
-            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + " " + String(advData[0]) + currentStatusString
+            let rssiAsString = String(hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
+            
+            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + "   RSSI: " + rssiAsString
 
+            // Create a custom cell.
             // Get discovered device's RSSI.
             let rssi = hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
             cell.detailTextLabel?.text = String(rssi)

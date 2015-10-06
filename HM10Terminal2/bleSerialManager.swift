@@ -24,7 +24,7 @@ import CoreBluetooth
 // 2. Alert view for warning about losing connections.
 // 3. Serial Buffer.
 // 4. Serial data recieved optional delegate.
-// 5.
+// 5. Create a connectToLastPeripheralConnected()
 
 
 
@@ -47,7 +47,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var reconnectTimer: NSTimer = NSTimer()
     
     // Device descriptors for discovered devices.
-    var discoveredDeviceList: Dictionary<NSUUID, CBPeripheral> = Dictionary()
+    private var discoveredDeviceList: Dictionary<NSUUID, CBPeripheral> = Dictionary()
     private var discoveredDeviceListRSSI: Dictionary<NSUUID, NSNumber> = Dictionary()
     private var discoveredDeviceListAdvertisementData: Dictionary<NSUUID, [String : AnyObject]> = Dictionary()
     private var discoveredDeviceListUUIDString: Dictionary<NSUUID, String> = Dictionary()
@@ -179,6 +179,10 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     // #MARK: Get discovered but unconnected device info
+    func getdiscoveredDeviceDictionary()->Dictionary<NSUUID, CBPeripheral>{
+        return discoveredDeviceList
+    }
+    
     func getNumberOfDiscoveredDevices()->Int{
         return discoveredDeviceList.count
     }
@@ -192,6 +196,16 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         let deviceName = discoveredDeviceListNameString[deviceOfInterest]
         if let deviceName = deviceName {
             return deviceName
+        }
+        else {
+            return ""
+        }
+    }
+    
+    func getDeviceUUIDAsString(deviceOfInterest: NSUUID)->String{
+        let deviceUUIDasString = discoveredDeviceListUUIDString[deviceOfInterest]
+        if let deviceUUIDasString = deviceUUIDasString {
+            return deviceUUIDasString
         }
         else {
             return ""
@@ -264,7 +278,12 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             let discoveredDevicekCBAdvDataServiceUUIDStrings = discoveredDevicekCBAdvDataServiceUUIDs as? NSArray
             if let discoveredDevicekCBAdvDataServiceUUIDStrings = discoveredDevicekCBAdvDataServiceUUIDStrings
             {
-                return discoveredDevicekCBAdvDataServiceUUIDStrings
+                if(discoveredDevicekCBAdvDataServiceUUIDs.count > 0){
+                    return discoveredDevicekCBAdvDataServiceUUIDStrings
+                }
+                else {
+                    return []
+                }
             }
         }
         return []
@@ -283,12 +302,21 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         return 0
     }
     
-//    func getAdvSolicitedUUID(deviceOfInterest: NSUUID)->String{
-//        if let discoveredDevicekCBAdvSolicitedServiceUUID = discoveredDevicekCBAdvSolicitedServiceUUID[deviceOfInterest] {
-//            return discoveredDevicekCBAdvSolicitedServiceUUID as String
-//        }
-//        return ""
-//    }
+    func getAdvSolicitedUUID(deviceOfInterest: NSUUID)->NSArray?{
+        if let discoveredDevicekCBAdvSolicitedServiceUUID = discoveredDevicekCBAdvSolicitedServiceUUID[deviceOfInterest] {
+            let solicitedUUID = discoveredDevicekCBAdvSolicitedServiceUUID as? NSArray
+            if let solicitedUUID = solicitedUUID
+            {
+                if(solicitedUUID.count > 0){
+                    return solicitedUUID
+                }
+                else {
+                    return []
+                }
+            }
+        }
+        return []
+    }
     
     func getSortedArraysBasedOnRSSI()-> (nsuuids: Array<NSUUID>, rssies: Array<NSNumber>){
 
@@ -385,15 +413,26 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
         else
         {
-            print("Nil found unwrapping AdvertisementDataLocalNameKey")
+            print("Nil found unwrapping AdvertisementDataTxPowerLevelKey")
         }
         
         let AdvertisementDataServiceUUIDsKey = advertisementData[CBAdvertisementDataServiceUUIDsKey]
         if let AdvertisementDataServiceUUIDsKey = AdvertisementDataServiceUUIDsKey {
             discoveredDevicekCBAdvDataServiceUUIDs.updateValue(AdvertisementDataServiceUUIDsKey, forKey: peripheral.identifier)
+        } else
+        {
+            print("Nil found unwrapping AdvertisementDataServiceUUIDsKey")
         }
 
-//        discoveredDevicekCBAdvSolicitedServiceUUID.updateValue(advertisementData[CBAdvertisementDataSolicitedServiceUUIDsKey] as! String, forKey: peripheral.identifier)
+        let AdvertisementDataSolicitedServiceUUIDsKey = advertisementData[CBAdvertisementDataSolicitedServiceUUIDsKey]
+        if let AdvertisementDataSolicitedServiceUUIDsKey = AdvertisementDataSolicitedServiceUUIDsKey {
+            discoveredDevicekCBAdvSolicitedServiceUUID.updateValue(AdvertisementDataSolicitedServiceUUIDsKey, forKey: peripheral.identifier)
+        } else {
+            print("Nil found unwrapping AdvertisementDataSolicitedServiceUUIDsKey")
+        }
+        
+        
+
 
 
         // Clear any connections.  (Strangely, if a search is initiated, all devices are disconnected without
@@ -425,8 +464,11 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         searchTimeoutTimer.invalidate()
         searchComplete = true
         printDiscoveredDeviceListInfo()
-        if let searchTimerExpired = delegate?.searchTimerExpired!(){
+        if let searchTimerExpired = delegate?.searchTimerExpired?(){
             searchTimerExpired
+        }
+        else {
+            // THROW ERROR
         }
     }
     
@@ -445,6 +487,9 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             if(connectedPeripherals.count < connectionsLimit){
                 if let deviceToConnect = discoveredDeviceList[deviceNSUUID] {
                     activeCentralManager.connectPeripheral(deviceToConnect, options: nil)
+                }
+                else {
+                    return false
                 }
             }
             else
@@ -479,7 +524,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             peripheralDevice.discoverServices(nil)
         }
         
-        if let connectedToDevice = delegate?.connectedToDevice!(){
+        if let connectedToDevice = delegate?.connectedToDevice?(){
             connectedToDevice
         }
         else {
