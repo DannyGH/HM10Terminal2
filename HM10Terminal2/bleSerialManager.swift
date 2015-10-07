@@ -25,6 +25,12 @@ import CoreBluetooth
 // 3. Serial Buffer.
 // 4. Serial data recieved optional delegate.
 // 5. Create a connectToLastPeripheralConnected()
+// 6.   // Add service array and getter methods
+        // Add characteristic array and getter methods
+        // Add characteristic descriptors array and getter methods
+// 7. Add option to connect search for specific device, services, characteristics, and descriptors.
+// 8. Save a white list of connections.  Provide option to reconnect on opening app.
+
 
 
 
@@ -52,6 +58,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     private var discoveredDeviceListAdvertisementData: Dictionary<NSUUID, [String : AnyObject]> = Dictionary()
     private var discoveredDeviceListUUIDString: Dictionary<NSUUID, String> = Dictionary()
     private var discoveredDeviceListNameString: Dictionary<NSUUID, String> = Dictionary()
+
 
     // Discovered device advertisement data.
     private var discoveredDevicekCBAdvDataManufacturerData: Dictionary<NSUUID, AnyObject> = Dictionary()
@@ -612,7 +619,6 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         connectedPeripheralCharacteristics.removeAll()
         connectedPeripheralCharacteristicsDescriptors.removeAll()
     }
-    
 
     
     // #MARK: Connection Lost.
@@ -627,6 +633,19 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             reconnectTimer = NSTimer.scheduledTimerWithTimeInterval(timeBeforeAttemptingReconnectOnDisconnect, target: self, selector: Selector("reconnectTimerExpired"), userInfo: nil, repeats: false)
         }
         
+    }
+    
+    func disconnectFromPeriphera(deviceOfInterest: NSUUID)->Bool {
+        let deviceToDisconnect = connectedPeripherals[deviceOfInterest]
+        if let deviceToDisconnect = deviceToDisconnect {
+            activeCentralManager.cancelPeripheralConnection(deviceToDisconnect)
+            return true
+        }
+        else
+        {
+            // ERROR: Device does not exist.
+            return false
+        }
     }
     
     func reconnectTimerExpired(){

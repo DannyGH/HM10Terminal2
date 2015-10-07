@@ -89,13 +89,16 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
             if(hm10serialManager.alreadyConnected(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])){
                 currentStatusString = " -- Connected"
             }
+            else {
+                currentStatusString = " -- Disconnected"
+            }
 
             let advData = (hm10serialManager.getAdvSolicitedUUID(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
             print(advData)
             
             let rssiAsString = String(hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
             
-            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + "   RSSI: " + rssiAsString
+            cell.nameLabel.text = hm10serialManager.getDeviceName(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]) + " " + currentStatusString
 
             // Create a custom cell.
             // Get discovered device's RSSI.
@@ -133,7 +136,13 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
     override func tableView(tableView: UITableView, didHighlightRowAtIndexPath indexPath: NSIndexPath) {
         
         // Connect to the selected device.
-        hm10serialManager.connectToDevice(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+        if(hm10serialManager.alreadyConnected(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])){
+           hm10serialManager.disconnectFromPeriphera(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+        }
+        else {
+            hm10serialManager.connectToDevice(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row])
+        }
+
 //        if let navigationController = navigationController {
             //navigationController.popToRootViewControllerAnimated(true)
 ///        }
