@@ -10,6 +10,7 @@ import UIKit
 import CoreBluetooth
 
 
+
 class TableViewController: UITableViewController, CBPeripheralDelegate, bleSerialDelegate {
     
     var discoveredDevicesNSUUIDSortedByRSSI: Array<NSUUID> = []
@@ -25,8 +26,12 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
         refreshController.endRefreshing()
     }
     
-    func deviceStatusChanged(){
+    func deviceStatusChanged(nsuuidOfDevice: NSUUID, thisDeviceState: Int) {
         
+        print(thisDeviceState)
+        print(nsuuidOfDevice)
+
+        self.tableView.reloadData()
     }
 
     func connectedToDevice() {
@@ -94,7 +99,7 @@ class TableViewController: UITableViewController, CBPeripheralDelegate, bleSeria
             }
 
             let advData = (hm10serialManager.getAdvSolicitedUUID(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
-            print(advData)
+//            print(advData)
             
             let rssiAsString = String(hm10serialManager.getDeviceRSSI(discoveredDevicesNSUUIDSortedByRSSI[indexPath.row]))
             

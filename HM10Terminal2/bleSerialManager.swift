@@ -10,11 +10,7 @@ import Foundation
 import CoreBluetooth
 //import CoreLocation
 
-@objc protocol bleSerialDelegate {
-    optional func searchTimerExpired()
-    optional func deviceStatusChanged()
-    optional func connectedToDevice()
-}
+
 
 
 
@@ -30,15 +26,23 @@ import CoreBluetooth
         // Add characteristic descriptors array and getter methods
 // 7. Add option to connect search for specific device, services, characteristics, and descriptors.
 // 8. Save a white list of connections.  Provide option to reconnect on opening app.
+// 9. Change searchTimerExpire and searchTimerExpireD so namespaces don't confuse.
 
 
 
+
+
+@objc protocol bleSerialDelegate {
+    optional func searchTimerExpired()
+    optional func deviceStatusChanged(nsuuidOfDevice: NSUUID, deviceState: Int)
+    optional func connectedToDevice()
+}
 
 class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
 //    let locationManager = CLLocationManager()
 //    var region: CLBeaconRegion?
-    
+
     // Delegate for search updates.
     var delegate:bleSerialDelegate? = nil
     
@@ -86,6 +90,20 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     }
     
+    enum deviceState {
+        
+        // Finish populating this with all states
+        // This is meant to be a preperation for a
+        // state machine method.  It will be addition
+        // to all the callback methods; putting them
+        // all in one place.
+        case unknown
+        case connectedState
+        case disconnectedState
+    }
+    
+    let state = deviceState.unknown
+    
     // Initialize the activeCentralManagerState
     private(set) var activeCentralManagerState: Int = 0
     
@@ -105,6 +123,8 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         private var retryIndexOnDisconnect = 0
         private var retryIndexOnFail = 0
     
+    // Flags
+    var purposefulDisconnect = false
     
     override init(){
         super.init()
@@ -448,9 +468,9 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         connectedPeripheralCharacteristics.removeAll()
         connectedPeripheralCharacteristicsDescriptors.removeAll()
         
-        print(CBAdvertisementDataLocalNameKey)
+//        print(CBAdvertisementDataLocalNameKey)
         
-        print(advertisementData)
+//        print(advertisementData)
         
         if let name = peripheral.name {
             discoveredDeviceListNameString.updateValue(name, forKey: peripheral.identifier)
@@ -628,10 +648,17 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         connectedPeripherals.removeValueForKey(peripheral.identifier)
         print("Lost connection to: \(peripheral.identifier)")
         
-        if(automaticReconnectOnDisconnect){
+        if(automaticReconnectOnDisconnect && purposefulDisconnect == false){
             activePeripheralManager.state
             reconnectTimer = NSTimer.scheduledTimerWithTimeInterval(timeBeforeAttemptingReconnectOnDisconnect, target: self, selector: Selector("reconnectTimerExpired"), userInfo: nil, repeats: false)
         }
+        else {
+            if let deviceStatusChanged = delegate?.deviceStatusChanged?(peripheral.identifier, deviceState: deviceState.unknown.hashValue){
+                purposefulDisconnect = false
+                deviceStatusChanged
+            }
+        }
+        
         
     }
     
@@ -639,6 +666,7 @@ class bleSerialManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         let deviceToDisconnect = connectedPeripherals[deviceOfInterest]
         if let deviceToDisconnect = deviceToDisconnect {
             activeCentralManager.cancelPeripheralConnection(deviceToDisconnect)
+            purposefulDisconnect = true
             return true
         }
         else
